@@ -18,36 +18,46 @@
       object-fit: cover;
     }
   </style>
+  <!-- Incluye la librería jwt-decode para el navegador -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsrsasign@10.5.25/lib/jsrsasign.min.js"></script>
 </head>
 <body>
-  <!-- Iframe de Metabase (generado dinámicamente) -->
-  <iframe
-    class="metabase-iframe"
-    src=""
-    frameborder="0">
-  </iframe>
-
+  <!-- Iframe de Metabase -->
+  <iframe id="metabaseIframe" class="metabase-iframe" frameborder="0"></iframe>
+  
   <!-- Imagen de Imgur -->
   <div class="imgur-image">
     <img src="https://i.imgur.com/YQdaMox.png" alt="Imagen">
   </div>
 
-  <!-- Script para generar el token JWT y actualizar el iframe -->
-  <script src="https://cdn.jsdelivr.net/npm/jsonwebtoken@8.5.1/dist/jwt.min.js"></script>
+  <!-- Script para generar el token JWT -->
   <script>
+    // Configuración
     const METABASE_SITE_URL = "http://reportes.lesa.ba:3000";
     const METABASE_SECRET_KEY = "217591ca0e8691d642438ec98b19465371465034ef5d9d7399d4894dc81c8790";
 
-    const payload = {
-      resource: { question: 636 },
-      params: {},
-      exp: Math.floor(Date.now() / 1000) + 600, // 10 min de expiración
-    };
+    // Generar token JWT
+    function generateToken() {
+      const header = { alg: 'HS256', typ: 'JWT' };
+      const payload = {
+        resource: { question: 636 },
+        params: {},
+        exp: Math.floor(Date.now() / 1000) + 600 // 10 minutos
+      };
+      
+      // Usamos jsrsasign para firmar el token en el navegador
+      const sHeader = JSON.stringify(header);
+      const sPayload = JSON.stringify(payload);
+      const token = KJUR.jws.JWS.sign("HS256", sHeader, sPayload, METABASE_SECRET_KEY);
+      
+      return token;
+    }
 
-    const token = jwt.sign(payload, METABASE_SECRET_KEY);
+    // Cargar el iframe con el token
+    const token = generateToken();
     const iframeUrl = `${METABASE_SITE_URL}/embed/question/${token}#bordered=true&titled=true`;
-    
-    document.querySelector('.metabase-iframe').src = iframeUrl;
+    document.getElementById('metabaseIframe').src = iframeUrl;
   </script>
 </body>
 </html>
