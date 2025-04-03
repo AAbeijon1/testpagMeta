@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard con Metabase e Imagen</title>
+  <title>Dashboard Metabase e Imagen</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
@@ -9,7 +9,6 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      overflow: hidden;
     }
     .dashboard {
       display: flex;
@@ -19,12 +18,8 @@
     .panel {
       flex: 1;
       height: 100%;
-      overflow: hidden;
     }
-    .metabase-panel {
-      border-right: 1px solid #e0e0e0;
-    }
-    .metabase-iframe {
+    .metabase-panel iframe {
       width: 100%;
       height: 100%;
       border: none;
@@ -47,26 +42,17 @@
         flex-direction: column;
       }
       .panel {
-        flex: none;
         height: 50vh;
-      }
-      .metabase-panel {
-        border-right: none;
-        border-bottom: 1px solid #e0e0e0;
       }
     }
   </style>
 </head>
 <body>
   <div class="dashboard">
-    <!-- Panel de Metabase -->
+    <!-- Panel de Metabase con el token generado -->
     <div class="panel metabase-panel">
-      <!-- 
-        IMPORTANTE: Reemplaza TOKEN_GENERADO_POR_SCRIPT con el token generado por el script de Node.js 
-      -->
       <iframe 
-        src="http://reportes.lesa.ba:3000/embed/question/TOKEN_GENERADO_POR_SCRIPT#bordered=true&titled=true" 
-        class="metabase-iframe" 
+        src="http://reportes.lesa.ba:3000/embed/question/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6NjM2fSwicGFyYW1zIjp7fSwiZXhwIjoxNzE0MzcyODAwfQ.wSjhkP4bvtAoRlOemR5vO9kayzvjz9BBirPCjzbh4LU#bordered=true&titled=true" 
         frameborder="0" 
         allowtransparency>
       </iframe>
