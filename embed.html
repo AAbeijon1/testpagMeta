@@ -4,6 +4,7 @@
   <title>Dashboard Metabase e Imagen</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <style>
     body {
       margin: 0;
@@ -19,7 +20,23 @@
       flex: 1;
       height: 100%;
     }
-    .metabase-panel iframe {
+    .metabase-panel {
+      position: relative;
+      overflow: hidden;
+    }
+    #metabase-notice {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.9);
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+      max-width: 80%;
+    }
+    #metabase-iframe {
       width: 100%;
       height: 100%;
       border: none;
@@ -35,6 +52,15 @@
       max-height: 100%;
       object-fit: contain;
     }
+    .button {
+      display: inline-block;
+      background-color: #509EE3;
+      color: white;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
     
     /* Responsive design */
     @media (max-width: 768px) {
@@ -49,13 +75,24 @@
 </head>
 <body>
   <div class="dashboard">
-    <!-- Panel de Metabase con el token actualizado (válido hasta 2030) -->
+    <!-- Panel de Metabase -->
     <div class="panel metabase-panel">
       <iframe 
-        src="http://reportes.lesa.ba:3000/embed/question/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6NjM2fSwicGFyYW1zIjp7fSwiZXhwIjoxODkzNDU2MDAwfQ.DnsGTGwdI9UvlKd--2aopkRAp9Yk8rUHAKPzSrpPZFI#bordered=true&titled=true" 
+        id="metabase-iframe"
+        src="http://192.168.82.99:3000/embed/question/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6NjM2fSwicGFyYW1zIjp7fSwiZXhwIjoxODkzNDU2MDAwfQ.DnsGTGwdI9UvlKd--2aopkRAp9Yk8rUHAKPzSrpPZFI#bordered=true&titled=true" 
         frameborder="0" 
         allowtransparency>
       </iframe>
+      <div id="metabase-notice">
+        <h3>Visualización de Metabase no disponible</h3>
+        <p>Estás accediendo a esta página desde fuera de la red local o a través de HTTPS.</p>
+        <p>Para ver el contenido completo, accede desde la red local con HTTP.</p>
+        <a href="http://192.168.82.99:3000/embed/question/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6NjM2fSwicGFyYW1zIjp7fSwiZXhwIjoxODkzNDU2MDAwfQ.DnsGTGwdI9UvlKd--2aopkRAp9Yk8rUHAKPzSrpPZFI#bordered=true&titled=true" 
+           target="_blank" 
+           class="button">
+          Abrir en nueva pestaña
+        </a>
+      </div>
     </div>
     
     <!-- Panel de imagen -->
@@ -63,5 +100,48 @@
       <img src="https://i.imgur.com/YQdaMox.png" alt="Imagen">
     </div>
   </div>
+
+  <script>
+    // Verificar si el iframe se carga correctamente
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const iframe = document.getElementById('metabase-iframe');
+        try {
+          // Intentar acceder al contenido del iframe
+          const iframeContent = iframe.contentWindow || iframe.contentDocument;
+          if (!iframeContent) {
+            showNotice();
+          }
+        } catch (e) {
+          // Si hay un error, probablemente sea por restricciones de seguridad
+          showNotice();
+        }
+      }, 2000); // Esperar 2 segundos
+    });
+
+    // Intentar con la otra URL si la primera falla
+    setTimeout(function() {
+      const iframe = document.getElementById('metabase-iframe');
+      try {
+        if (!iframe.contentWindow || !iframe.contentDocument) {
+          iframe.src = "http://reportes.lesa.ba:3000/embed/question/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6NjM2fSwicGFyYW1zIjp7fSwiZXhwIjoxODkzNDU2MDAwfQ.DnsGTGwdI9UvlKd--2aopkRAp9Yk8rUHAKPzSrpPZFI#bordered=true&titled=true";
+          console.log("Intentando con dominio DNS");
+        }
+      } catch (e) {
+        console.log("Error al acceder al iframe, intentando con dominio DNS");
+        iframe.src = "http://reportes.lesa.ba:3000/embed/question/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6NjM2fSwicGFyYW1zIjp7fSwiZXhwIjoxODkzNDU2MDAwfQ.DnsGTGwdI9UvlKd--2aopkRAp9Yk8rUHAKPzSrpPZFI#bordered=true&titled=true";
+      }
+    }, 3000);
+
+    function showNotice() {
+      document.getElementById('metabase-notice').style.display = 'block';
+    }
+
+    // Detectar si estamos en GitHub Pages (HTTPS)
+    if (window.location.protocol === 'https:') {
+      console.log("Detectado protocolo HTTPS");
+      showNotice();
+    }
+  </script>
 </body>
 </html>
